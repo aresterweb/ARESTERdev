@@ -1,0 +1,25 @@
+{
+  "name": "ARESTERdev Phase 1\u20135",
+  "version": "1.0.0-staging",
+  "generated": "2026-09-04",
+  "pages": [
+    "privacy.html",
+    "index.html",
+    "portfolio.html",
+    "admin.html",
+    "services.html",
+    "login.html",
+    "terms.html",
+    "customer.html",
+    "pricing.html",
+    "products.html",
+    "support.html",
+    "about.html",
+    "license.html"
+  ],
+  "safety": {
+    "indexing": false,
+    "live_payment": false,
+    "public_delivery": false
+  }
+}
