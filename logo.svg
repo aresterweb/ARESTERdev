@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 96" role="img" aria-label="ARESTERdev">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#67e8f9"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs>
+<rect width="96" height="96" rx="24" fill="#07111d"/>
+<path d="M20 68 43 24h12l22 44H63l-5-11H39l-5 11H20Zm24-22h10l-5-11-5 11Z" fill="url(#g)"/>
+<path d="M72 22v14M65 29h14" stroke="#67e8f9" stroke-width="3" stroke-linecap="round"/>
+<text x="116" y="61" font-family="Inter,Arial,sans-serif" font-size="48" font-weight="800" fill="#f8fafc">ARESTER</text>
+<text x="324" y="61" font-family="Inter,Arial,sans-serif" font-size="28" font-weight="700" fill="#67e8f9">dev</text>
+</svg>
