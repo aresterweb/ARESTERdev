@@ -85,3 +85,15 @@ body.is-loading{overflow:hidden}
 .order-summary p{margin:8px 0 0;color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere}
 @media(max-width:850px){.catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.catalog-grid{grid-template-columns:1fr}.catalog-filter{font-size:12px;padding:8px 12px}}
+
+
+/* ARESTER_PRODUCT_FORM_STYLE_V2 */
+.product-specific-fields{display:grid;gap:10px;margin:18px 0}
+.product-specific-fields h3{font-size:18px;margin:10px 0}
+.product-specific-fields label{font-size:13px;font-weight:650;margin-top:6px}
+.product-specific-fields input,.product-specific-fields textarea{
+  box-sizing:border-box;width:100%;padding:13px 14px;
+  border:1px solid var(--line);border-radius:12px;
+  background:var(--panel);color:var(--text);font:inherit
+}
+.product-specific-fields textarea{resize:vertical}

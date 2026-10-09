@@ -169,3 +169,159 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   updateSummary();
 });
+
+
+/* ARESTER_PRODUCT_FORM_PATCH_V2 */
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("catalog-order-form");
+  const product = document.getElementById("order-product");
+  const summary = document.getElementById("order-summary");
+  if (!form || !product || !summary) return;
+
+  const definitions = {
+    "Landing page": ["Website", [
+      ["Tujuan halaman", "Tujuan promosi dan target pengunjung", true, "textarea"],
+      ["Bagian halaman", "Fitur, harga, testimoni, kontak", true, "textarea"],
+      ["Fitur tambahan", "Formulir, WhatsApp, analitik", false, "textarea"]]],
+    "Website profil bisnis": ["Website", [
+      ["Nama dan bidang bisnis", "Nama usaha dan bidangnya", true, "text"],
+      ["Halaman yang diperlukan", "Tentang, layanan, portofolio, kontak", true, "textarea"],
+      ["Fitur tambahan", "Peta, blog, formulir", false, "textarea"]]],
+    "Website custom": ["Website", [
+      ["Tujuan website", "Apa yang ingin dibuat", true, "textarea"],
+      ["Fitur dan alur", "Jelaskan kebutuhan secara rinci", true, "textarea"],
+      ["Referensi", "Tautan contoh", false, "url"]]],
+    "Bot Telegram": ["Bot", [
+      ["Fungsi bot", "Informasi, admin, game, atau otomasi", true, "textarea"],
+      ["Perintah bot", "Contoh: /start, /help", false, "text"],
+      ["Integrasi", "API, database, pembayaran", false, "textarea"]]],
+    "Bot custom": ["Bot", [
+      ["Platform", "Telegram, web, atau lainnya", true, "text"],
+      ["Alur kerja", "Jelaskan cara kerja yang dibutuhkan", true, "textarea"],
+      ["Integrasi", "API, database, layanan eksternal", false, "textarea"]]],
+    "Undangan digital": ["Undangan Digital", [
+      ["Jenis acara", "Pernikahan, ulang tahun, atau acara lain", true, "text"],
+      ["Tanggal dan waktu", "Tanggal serta jam acara", true, "text"],
+      ["Lokasi", "Alamat atau tautan peta", true, "text"],
+      ["Fitur undangan", "RSVP, galeri, musik, hitung mundur", false, "textarea"]]],
+    "Tools dan otomatisasi": ["Tools & Otomatisasi", [
+      ["Proses saat ini", "Pekerjaan yang ingin diotomatisasi", true, "textarea"],
+      ["Alur yang diinginkan", "Langkah awal sampai hasil akhir", true, "textarea"],
+      ["Platform dan integrasi", "Web, Telegram, API, spreadsheet", false, "textarea"]]],
+    "Maintenance website": ["Maintenance & Custom", [
+      ["URL website", "https://...", true, "url"],
+      ["Masalah", "Jelaskan masalah atau pesan error", true, "textarea"],
+      ["Prioritas", "Normal, segera, atau fleksibel", false, "text"]]],
+    "Permintaan custom": ["Maintenance & Custom", [
+      ["Jenis proyek", "Website, bot, integrasi, lainnya", true, "text"],
+      ["Detail kebutuhan", "Jelaskan hasil yang diharapkan", true, "textarea"],
+      ["Catatan", "Batasan atau kebutuhan khusus", false, "textarea"]]]
+  };
+
+  let host = document.getElementById("product-specific-fields");
+  if (!host) {
+    host = document.createElement("div");
+    host.id = "product-specific-fields";
+    host.className = "product-specific-fields";
+    product.insertAdjacentElement("afterend", host);
+  }
+
+  const val = id => document.getElementById(id)?.value?.trim() || "";
+  const details = () => [...host.querySelectorAll("input,textarea")].map(el => {
+    const label = host.querySelector('label[for="' + el.id + '"]');
+    return [label ? label.textContent.replace(/ \*$/, "") : el.name, el.value.trim()];
+  });
+
+  function renderFields() {
+    host.replaceChildren();
+    const def = definitions[product.value];
+    if (!def) return;
+
+    const heading = document.createElement("h3");
+    heading.textContent = "Detail khusus: " + product.value;
+    host.append(heading);
+
+    def[1].forEach(([name, placeholder, required, type], i) => {
+      const id = "product-extra-" + i;
+      const label = document.createElement("label");
+      label.htmlFor = id;
+      label.textContent = name + (required ? " *" : "");
+
+      const input = document.createElement(type === "textarea" ? "textarea" : "input");
+      input.id = id;
+      input.name = "product_extra_" + i;
+      input.placeholder = placeholder;
+      input.required = required;
+      input.maxLength = 2000;
+      if (type === "textarea") input.rows = 3;
+      else input.type = type;
+
+      host.append(label, input);
+    });
+    updateSummary();
+  }
+
+  function updateSummary() {
+    const def = definitions[product.value];
+    const lines = [
+      "Produk: " + (product.value || "-"),
+      "Kategori: " + (def ? def[0] : "-"),
+      "Nama: " + (val("order-name") || "-"),
+      "Kebutuhan umum: " + (val("order-description") || "-"),
+      ...details().map(([k,v]) => k + ": " + (v || "-")),
+      "Referensi: " + (val("order-reference") || "-"),
+      "Anggaran: " + (val("order-budget") || "-"),
+      "Target waktu: " + (val("order-deadline") || "-")
+    ];
+    const strong = document.createElement("strong");
+    strong.textContent = "Ringkasan pesanan";
+    const paragraph = document.createElement("p");
+    paragraph.textContent = lines.join("\n");
+    summary.replaceChildren(strong, paragraph);
+  }
+
+  product.addEventListener("change", renderFields);
+  form.addEventListener("input", updateSummary);
+  form.addEventListener("change", updateSummary);
+
+  document.querySelectorAll(".catalog-select").forEach(button => {
+    button.addEventListener("click", () => {
+      const name = button.dataset.product;
+      if (!definitions[name]) return;
+      product.value = name;
+      renderFields();
+      document.getElementById("form-pesanan")?.scrollIntoView({
+        behavior: "smooth", block: "start"
+      });
+    });
+  });
+
+  renderFields();
+
+  // Satu handler submit tambahan untuk memastikan detail khusus ikut terkirim.
+  form.addEventListener("submit", event => {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    const def = definitions[product.value];
+    if (!def) {
+      product.reportValidity();
+      return;
+    }
+
+    const message = [
+      "Halo ARESTERdev, saya ingin memesan layanan.",
+      "Produk: " + product.value,
+      "Kategori: " + def[0],
+      "Nama: " + val("order-name"),
+      "Kebutuhan: " + val("order-description"),
+      ...details().map(([k,v]) => k + ": " + (v || "-")),
+      "Referensi: " + (val("order-reference") || "-"),
+      "Anggaran: " + (val("order-budget") || "-"),
+      "Target waktu: " + (val("order-deadline") || "-"),
+      "Mohon informasi harga dan estimasi pengerjaan."
+    ].join("\n");
+
+    window.open("https://wa.me/6281511585275?text=" +
+      encodeURIComponent(message), "_blank", "noopener,noreferrer");
+  });
+});
