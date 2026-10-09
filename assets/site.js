@@ -1,13 +1,34 @@
-/* ARESTERdev website configuration.
-   Add the official WhatsApp Business number below using international digits only,
-   without +, spaces, or punctuation (example format: 6281234567890).
-*/
+/* ARESTERdev interactions: navigation, reveal animations, and page loader. */
 const ARESTERDEV_CONFIG = {
   whatsappNumber: "6281511585275"
 };
 
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("[data-year]").forEach(el => el.textContent = new Date().getFullYear());
+
+  // Accessible loading screen. It is removed after the page is ready, with a failsafe.
+  const loader = document.createElement("div");
+  loader.className = "site-loader";
+  loader.setAttribute("role", "status");
+  loader.setAttribute("aria-label", "Memuat website ARESTERdev");
+  loader.innerHTML = '<div class="loader-inner"><div class="loader-mark" aria-hidden="true"><span></span><span></span><span></span></div><p class="loader-name">ARESTER<span>dev</span></p><div class="loader-track"><i></i></div><small>Menyiapkan pengalaman digital Anda</small></div>';
+  document.body.prepend(loader);
+  document.body.classList.add("is-loading");
+
+  let loaderHidden = false;
+  const hideLoader = () => {
+    if (loaderHidden) return;
+    loaderHidden = true;
+    loader.classList.add("is-loaded");
+    document.body.classList.remove("is-loading");
+    window.setTimeout(() => loader.remove(), 650);
+  };
+  if (document.readyState === "complete") {
+    window.setTimeout(hideLoader, 180);
+  } else {
+    window.addEventListener("load", () => window.setTimeout(hideLoader, 180), { once: true });
+  }
+  window.setTimeout(hideLoader, 3500);
 
   const toggle = document.querySelector(".nav-toggle");
   const nav = document.querySelector(".main-nav");
@@ -30,16 +51,27 @@ document.addEventListener("DOMContentLoaded", () => {
     link.rel = "noopener noreferrer";
   });
 
-  const observer = "IntersectionObserver" in window ? new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("is-visible");
-        observer.unobserve(entry.target);
-      }
-    });
-  }, {threshold: 0.12}) : null;
-  document.querySelectorAll(".reveal").forEach(el => {
-    if (observer) observer.observe(el);
-    else el.classList.add("is-visible");
+  // Existing .reveal classes continue to work; progressively animate common content blocks too.
+  document.querySelectorAll(".section-heading, .service-card, .step, .portfolio-note, .article-card, .faq-list details, .info-card, .contact-card, .product-placeholder").forEach(el => {
+    if (!el.closest(".site-loader") && !el.classList.contains("reveal")) el.classList.add("reveal");
   });
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const revealItems = document.querySelectorAll(".reveal");
+  if (!reducedMotion && "IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: "0px 0px -24px 0px" });
+    revealItems.forEach((el, index) => {
+      el.style.setProperty("--reveal-delay", `${Math.min(index % 4, 3) * 70}ms`);
+      observer.observe(el);
+    });
+  } else {
+    revealItems.forEach(el => el.classList.add("is-visible"));
+  }
 });
