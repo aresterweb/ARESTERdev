@@ -11,7 +11,7 @@ Website statis multi-halaman untuk brand ARESTERdev. Desain: elegant minimalis, 
 
 ## WAJIB sebelum publikasi
 1. Edit `assets/site.js`, ganti `ISI_NOMOR_WA_BUSINESS_DI_SINI` dengan nomor WhatsApp Business internasional tanpa `+`, spasi, atau tanda baca.
-2. Ganti seluruh `https://aresterweb.github.io/ARESTERdev` pada `index.html`, `robots.txt`, dan `sitemap.xml` dengan URL final yang benar.
+2. Ganti seluruh `https://aresterdev.vercel.app` pada `index.html`, `robots.txt`, dan `sitemap.xml` dengan URL final yang benar.
 3. Isi sendiri kontak resmi pada `contact.html`: WhatsApp Business, email bisnis, Facebook, dan Instagram. Jangan memakai kontak yang ditebak.
 4. Periksa semua informasi, nama bisnis, layanan, dan klaim agar sesuai praktik aktual.
 5. Tambahkan hanya portofolio dan testimoni yang nyata. Halaman portofolio dan produk saat ini sengaja menjelaskan bahwa katalog belum diisi, bukan mengarang karya/produk.
