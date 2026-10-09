@@ -1,0 +1,4 @@
+*.backup*
+contact-info.txt
+.env
+.env.*

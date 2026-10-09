@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://aresterweb.github.io/ARESTERdev/sitemap.xml
