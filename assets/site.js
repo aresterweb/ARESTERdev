@@ -99,3 +99,73 @@ document.addEventListener("DOMContentLoaded", () => {
     revealItems.forEach(el => el.classList.add("is-visible"));
   }
 });
+
+
+/* CATALOG_ORDER_FORM_V1 */
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("catalog-order-form");
+  if (!form) return;
+  const product = document.getElementById("order-product");
+  const summary = document.getElementById("order-summary");
+  const field = id => document.getElementById(id);
+  const cards = [...document.querySelectorAll(".catalog-card")];
+  const filters = [...document.querySelectorAll(".catalog-filter")];
+
+  function updateSummary() {
+    const lines = [
+      "Produk: " + (product.value || "Belum dipilih"),
+      "Nama: " + (field("order-name").value.trim() || "Belum diisi"),
+      "Kebutuhan: " + (field("order-description").value.trim() || "Belum diisi"),
+      "Referensi: " + (field("order-reference").value.trim() || "-"),
+      "Anggaran: " + field("order-budget").value,
+      "Target waktu: " + (field("order-deadline").value.trim() || "Belum ditentukan")
+    ];
+    const p = document.createElement("p");
+    p.textContent = lines.join("\n");
+    summary.replaceChildren();
+    const strong = document.createElement("strong");
+    strong.textContent = "Ringkasan pesanan";
+    summary.append(strong, p);
+  }
+
+  document.querySelectorAll(".catalog-select").forEach(button => {
+    button.addEventListener("click", () => {
+      product.value = button.dataset.product;
+      updateSummary();
+      field("form-pesanan").scrollIntoView({behavior:"smooth", block:"start"});
+    });
+  });
+
+  filters.forEach(button => button.addEventListener("click", () => {
+    filters.forEach(f => {
+      f.classList.toggle("is-active", f === button);
+      f.setAttribute("aria-pressed", String(f === button));
+    });
+    cards.forEach(card => {
+      card.hidden = button.dataset.category !== "all" &&
+                    card.dataset.category !== button.dataset.category;
+    });
+  }));
+
+  form.addEventListener("input", updateSummary);
+  form.addEventListener("change", updateSummary);
+  form.addEventListener("submit", event => {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    const value = id => field(id).value.trim();
+    const message = [
+      "Halo ARESTERdev! Saya ingin mengajukan pesanan.",
+      "",
+      "PRODUK: " + value("order-product"),
+      "NAMA: " + value("order-name"),
+      "KEBUTUHAN: " + value("order-description"),
+      "REFERENSI: " + (value("order-reference") || "-"),
+      "ANGGARAN: " + value("order-budget"),
+      "TARGET WAKTU: " + (value("order-deadline") || "Belum ditentukan"),
+      "",
+      "Mohon informasi harga dan estimasi pengerjaan. Terima kasih."
+    ].join("\n");
+    window.location.href = "https://wa.me/6281511585275?text=" + encodeURIComponent(message);
+  });
+  updateSummary();
+});
