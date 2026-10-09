@@ -1,17 +1,25 @@
-/* ARESTERdev interactions: navigation, reveal animations, and page loader. */
+/* ARESTERdev: navigation, WhatsApp links, reveal animations, and page loader. */
 const ARESTERDEV_CONFIG = {
   whatsappNumber: "6281511585275"
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll("[data-year]").forEach(el => el.textContent = new Date().getFullYear());
+  document.querySelectorAll("[data-year]").forEach(el => {
+    el.textContent = new Date().getFullYear();
+  });
 
-  // Accessible loading screen. It is removed after the page is ready, with a failsafe.
+  // Loading screen dibuat oleh JS sehingga tidak perlu mengedit semua halaman.
   const loader = document.createElement("div");
   loader.className = "site-loader";
   loader.setAttribute("role", "status");
   loader.setAttribute("aria-label", "Memuat website ARESTERdev");
-  loader.innerHTML = '<div class="loader-inner"><div class="loader-mark" aria-hidden="true"><span></span><span></span><span></span></div><p class="loader-name">ARESTER<span>dev</span></p><div class="loader-track"><i></i></div><small>Menyiapkan pengalaman digital Anda</small></div>';
+  loader.innerHTML =
+    '<div class="loader-inner">' +
+      '<div class="loader-mark" aria-hidden="true"><span></span><span></span><span></span></div>' +
+      '<p class="loader-name">ARESTER<span>dev</span></p>' +
+      '<div class="loader-track"><i></i></div>' +
+      '<small>Menyiapkan pengalaman digital Anda</small>' +
+    '</div>';
   document.body.prepend(loader);
   document.body.classList.add("is-loading");
 
@@ -21,15 +29,20 @@ document.addEventListener("DOMContentLoaded", () => {
     loaderHidden = true;
     loader.classList.add("is-loaded");
     document.body.classList.remove("is-loading");
-    window.setTimeout(() => loader.remove(), 650);
+    window.setTimeout(() => loader.remove(), 550);
   };
+
   if (document.readyState === "complete") {
     window.setTimeout(hideLoader, 180);
   } else {
-    window.addEventListener("load", () => window.setTimeout(hideLoader, 180), { once: true });
+    window.addEventListener("load", () => {
+      window.setTimeout(hideLoader, 180);
+    }, { once: true });
   }
+  // Failsafe agar overlay tidak menutupi halaman jika suatu aset gagal dimuat.
   window.setTimeout(hideLoader, 3500);
 
+  // Menu responsif.
   const toggle = document.querySelector(".nav-toggle");
   const nav = document.querySelector(".main-nav");
   if (toggle && nav) {
@@ -38,26 +51,36 @@ document.addEventListener("DOMContentLoaded", () => {
       toggle.setAttribute("aria-expanded", String(!expanded));
       nav.classList.toggle("is-open", !expanded);
     });
-    nav.querySelectorAll("a").forEach(link => link.addEventListener("click", () => {
-      toggle.setAttribute("aria-expanded", "false");
-      nav.classList.remove("is-open");
-    }));
+
+    nav.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => {
+        toggle.setAttribute("aria-expanded", "false");
+        nav.classList.remove("is-open");
+      });
+    });
   }
 
+  // Tautan konsultasi WhatsApp.
   document.querySelectorAll(".whatsapp-link").forEach(link => {
     const message = link.dataset.message || "Halo ARESTERdev, saya ingin bertanya.";
-    link.href = "https://wa.me/" + ARESTERDEV_CONFIG.whatsappNumber + "?text=" + encodeURIComponent(message);
+    link.href = "https://wa.me/" + ARESTERDEV_CONFIG.whatsappNumber +
+      "?text=" + encodeURIComponent(message);
     link.target = "_blank";
     link.rel = "noopener noreferrer";
   });
 
-  // Existing .reveal classes continue to work; progressively animate common content blocks too.
-  document.querySelectorAll(".section-heading, .service-card, .step, .portfolio-note, .article-card, .faq-list details, .info-card, .contact-card, .product-placeholder").forEach(el => {
-    if (!el.closest(".site-loader") && !el.classList.contains("reveal")) el.classList.add("reveal");
+  // Tambahkan reveal ke blok konten umum tanpa mengubah HTML halaman.
+  document.querySelectorAll(
+    ".section-heading, .service-card, .step, .portfolio-note, " +
+    ".article-card, .faq-list details, .info-card, .contact-card, .product-placeholder"
+  ).forEach(el => {
+    if (!el.classList.contains("reveal")) el.classList.add("reveal");
   });
 
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const revealItems = document.querySelectorAll(".reveal");
+  const reducedMotion = window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
   if (!reducedMotion && "IntersectionObserver" in window) {
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
@@ -67,8 +90,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     }, { threshold: 0.1, rootMargin: "0px 0px -24px 0px" });
+
     revealItems.forEach((el, index) => {
-      el.style.setProperty("--reveal-delay", `${Math.min(index % 4, 3) * 70}ms`);
+      el.style.setProperty("--reveal-delay", `${(index % 4) * 70}ms`);
       observer.observe(el);
     });
   } else {
