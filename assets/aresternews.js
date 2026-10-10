@@ -87,7 +87,8 @@
     const loginPanel = login.closest('.an-panel');
     const form = $('#an-form');
 
-    function tell(s) { msg.textContent = s; }
+    function tell(s) { msg.textContent = s || ''; }
+    function clearMessage() { tell(''); }
     function slugify(s) {
       return s.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'')
         .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,100);
@@ -130,11 +131,18 @@
       const valid = session && (session.user.email || '').toLowerCase() === cfg.adminEmail.toLowerCase();
       loginPanel.hidden = !!valid;
       editor.hidden = !valid;
-      if (session && !valid) {
-        await client.auth.signOut();
-        tell('Email ini tidak diizinkan menjadi admin.');
+
+      if (!valid) {
+        clearMessage();
+        if (session) {
+          await client.auth.signOut();
+          tell('Email ini tidak diizinkan menjadi admin.');
+        }
+        return;
       }
-      if (valid) { tell('Login berhasil.'); await refresh(); }
+
+      clearMessage();
+      await refresh();
     }
 
     login.addEventListener('submit', async e => {
@@ -143,6 +151,7 @@
       if (String(fd.get('email')).toLowerCase() !== cfg.adminEmail.toLowerCase()) {
         tell('Gunakan email admin yang sudah ditentukan.'); return;
       }
+      clearMessage();
       tell('Memeriksa akun…');
       const {error} = await client.auth.signInWithPassword({
         email:String(fd.get('email')).trim(),
@@ -194,7 +203,9 @@
     $('#an-logout').addEventListener('click', async () => {
       await client.auth.signOut(); await showSession();
     });
-    client.auth.onAuthStateChange(() => { showSession(); });
+    client.auth.onAuthStateChange(() => {
+      setTimeout(() => { showSession(); }, 0);
+    });
     await showSession();
   }
 
