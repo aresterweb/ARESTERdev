@@ -168,7 +168,10 @@
           <label>Isi berita lengkap *<textarea name="content" rows="12" required placeholder="Apa yang terjadi? Siapa yang terlibat? Kapan dan di mana? Mengapa penting? Apa dampaknya?"></textarea></label>
           <label>Nama sumber berita<input name="source_name" maxlength="180" placeholder="Contoh: nama media, situs resmi, atau lembaga"></label>
           <label>URL sumber asli<input name="source_url" type="url" placeholder="https://..."></label>
-          <label>URL gambar sampul<input name="cover_url" type="url" placeholder="https://..."></label>
+          <label>Gambar sampul dari galeri HP<input name="cover_file" type="file" accept="image/jpeg,image/png,image/webp" /></label>
+          <div id="an-cover-preview-wrap" hidden><img id="an-cover-preview" alt="Pratinjau gambar sampul" style="display:block;width:100%;max-height:320px;object-fit:cover;border-radius:12px;margin:10px 0"></div>
+          <label>Atau URL gambar sampul<input name="cover_url" type="url" placeholder="https://..."></label>
+          <p class="an-help">Disarankan rasio 16:9 (1200 × 675 px), JPG/PNG/WebP, maksimal 5 MB.</p>
           <label>Status publikasi<select name="status"><option value="draft">Simpan sebagai draft</option><option value="published">Terbitkan sekarang</option></select></label>
           <p>Pastikan fakta, tanggal, dan sumber diperiksa sebelum berita diterbitkan.</p>
           <div class="an-actions"><button type="submit">Simpan berita</button><button id="an-clear" type="button">Berita baru</button></div>
@@ -181,6 +184,32 @@
     const login = $('#an-login');
     const loginPanel = login.closest('.an-panel');
     const form = $('#an-form');
+    const coverFile = form.elements.cover_file;
+    const coverUrl = form.elements.cover_url;
+    const previewWrap = $('#an-cover-preview-wrap');
+    const preview = $('#an-cover-preview');
+    let uploadedCoverUrl = '';
+    const bucketName = 'aresternews-covers';
+    function showCoverPreview(url) {
+      if (!url) { previewWrap.hidden = true; preview.removeAttribute('src'); return; }
+      preview.src = url; previewWrap.hidden = false;
+    }
+    coverUrl.addEventListener('input', () => {
+      uploadedCoverUrl = '';
+      showCoverPreview(coverUrl.value.trim());
+    });
+    coverFile.addEventListener('change', () => {
+      const file = coverFile.files && coverFile.files[0];
+      if (!file) return;
+      if (!['image/jpeg','image/png','image/webp'].includes(file.type)) {
+        tell('Pilih gambar JPG, PNG, atau WebP.'); coverFile.value=''; return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        tell('Ukuran gambar maksimal 5 MB.'); coverFile.value=''; return;
+      }
+      showCoverPreview(URL.createObjectURL(file));
+      tell('Gambar siap diunggah saat berita disimpan.');
+    });
 
     function tell(s) { msg.textContent = s || ''; }
     function clearMessage() { tell(''); }
@@ -188,7 +217,7 @@
       return s.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'')
         .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,100);
     }
-    function clearForm() { form.reset(); form.elements.id.value=''; }
+    function clearForm() { form.reset(); form.elements.id.value=''; uploadedCoverUrl=''; showCoverPreview(''); }
 
     async function refresh() {
       const {data,error} = await client.from(table).select('*').order('created_at',{ascending:false});
@@ -205,8 +234,10 @@
         edit.type = 'button'; edit.textContent = 'Edit';
         edit.addEventListener('click', () => {
           Object.keys(a).forEach(k => {
-            if (form.elements[k]) form.elements[k].value = a[k] ?? '';
+            if (form.elements[k] && form.elements[k].type !== 'file') form.elements[k].value = a[k] ?? '';
           });
+          uploadedCoverUrl = a.cover_url || '';
+          showCoverPreview(a.cover_url || '');
           window.scrollTo({top:0,behavior:'smooth'});
         });
         const del = document.createElement('button');
@@ -283,6 +314,24 @@
         published_at: status === 'published' ? new Date().toISOString() : null,
         updated_at: new Date().toISOString()
       };
+      const selectedFile = coverFile.files && coverFile.files[0];
+      if (selectedFile) {
+        const { data: { session: uploadSession } } = await client.auth.getSession();
+        if (!uploadSession || (uploadSession.user.email || '').toLowerCase() !== cfg.adminEmail.toLowerCase()) {
+          tell('Sesi admin tidak valid. Silakan masuk kembali.'); return;
+        }
+        tell('Mengunggah gambar sampul…');
+        const ext = selectedFile.type === 'image/png' ? 'png' : selectedFile.type === 'image/webp' ? 'webp' : 'jpg';
+        const storagePath = `${Date.now()}-${Math.random().toString(36).slice(2,10)}.${ext}`;
+        const { error: uploadError } = await client.storage.from(bucketName).upload(storagePath, selectedFile, {
+          contentType: selectedFile.type, upsert: false, cacheControl: '3600'
+        });
+        if (uploadError) {
+          tell('Upload gagal: ' + uploadError.message + '. Pastikan bucket dan kebijakan Storage sudah dibuat.'); return;
+        }
+        const { data: publicData } = client.storage.from(bucketName).getPublicUrl(storagePath);
+        payload.cover_url = publicData.publicUrl;
+      }
       let result;
       if (oldId) {
         delete payload.slug;
