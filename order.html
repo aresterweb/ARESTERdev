@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Formulir pemesanan layanan ARESTERdev.">
+<title>Pemesanan — ARESTERdev</title>
+<link rel="icon" href="assets/aresterdev-logo-original.png">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.order-wrap{max-width:850px;margin:auto}
+.order-panel{padding:clamp(20px,4vw,38px);border:1px solid rgba(255,255,255,.14);border-radius:20px}
+.order-panel form{display:grid;gap:12px}
+.order-panel label{font-weight:600;margin-top:8px}
+.order-panel input,.order-panel select,.order-panel textarea{box-sizing:border-box;width:100%;padding:13px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:#101014;color:inherit;font:inherit}
+.order-panel textarea{resize:vertical}
+#specific-fields{display:grid;gap:8px}
+.order-summary{white-space:pre-wrap;padding:16px;border-radius:12px;background:rgba(128,128,128,.12);overflow-wrap:anywhere}
+.small-note{opacity:.8;font-size:.92rem}
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container nav-wrap">
+<a class="brand" href="index.html"><img src="assets/aresterdev-logo-original.png" alt="Logo ARESTERdev"></a>
+<button class="nav-toggle" aria-expanded="false" aria-controls="main-nav" aria-label="Buka menu"><span></span><span></span><span></span></button>
+<nav id="main-nav" class="main-nav">
+<a href="index.html">Home</a><a href="about.html">Tentang Kami</a><a href="services.html">Layanan</a><a href="products.html">Produk Digital</a>
+<a class="button button-small whatsapp-link" data-message="Halo ARESTERdev, saya ingin berkonsultasi." href="#">Hubungi Kami ↗</a>
+</nav></div></header>
+<main id="main">
+<section class="page-hero"><div class="container">
+<p class="eyebrow">PEMESANAN ARESTERdev</p>
+<h1>Ceritakan <span class="gradient-text">kebutuhanmu.</span></h1>
+<p class="lead">Harga dan estimasi pengerjaan dikonfirmasi setelah kebutuhan ditinjau.</p>
+</div></section>
+<section class="section"><div class="container order-wrap"><div class="order-panel">
+<form id="order-form">
+<label for="product">Produk / layanan *</label>
+<select id="product" required>
+<option value="">Pilih layanan</option>
+<option>Landing page</option><option>Website profil bisnis</option><option>Website custom</option>
+<option>Bot Telegram</option><option>Bot custom</option><option>Undangan digital</option>
+<option>Tools dan otomatisasi</option><option>Maintenance website</option><option>Permintaan custom</option>
+</select>
+<div id="specific-fields"></div>
+<label for="name">Nama pemesan *</label><input id="name" required maxlength="100" autocomplete="name" placeholder="Nama kamu">
+<label for="description">Ringkasan kebutuhan *</label><textarea id="description" required rows="3" maxlength="2000" placeholder="Tujuan, fitur, atau masalah yang ingin diselesaikan"></textarea>
+<label for="reference">Referensi / tautan (opsional)</label><input id="reference" maxlength="500" placeholder="Tautan website atau contoh">
+<label for="budget">Anggaran (opsional)</label><select id="budget">
+<option>Belum ditentukan</option><option>Di bawah Rp250.000</option><option>Rp250.000–Rp500.000</option><option>Rp500.000–Rp1.000.000</option><option>Di atas Rp1.000.000</option><option>Diskusikan dahulu</option>
+</select>
+<label for="deadline">Target waktu (opsional)</label><input id="deadline" maxlength="100" placeholder="Contoh: fleksibel">
+<div id="summary" class="order-summary" aria-live="polite"></div>
+<button class="button" type="submit">Lanjutkan ke WhatsApp ↗</button>
+<p class="small-note">WhatsApp terbuka dengan pesan siap kirim. Periksa lalu tekan Kirim.</p>
+<a href="products.html">← Kembali ke katalog</a>
+</form></div></div></section>
+</main>
+<footer class="site-footer"><div class="container footer-bottom"><span>© <span data-year></span> ARESTERdev</span><div><a href="privacy.html">Kebijakan Privasi</a><a href="terms.html">Syarat Layanan</a><a href="disclaimer.html">Disclaimer</a><a href="contact.html">Kontak</a></div></div></footer>
+<script src="assets/site.js"></script>
+<script>
+(() => {
+const defs = {
+"Landing page":[["Tujuan halaman","Tujuan promosi dan target pengunjung","textarea"],["Bagian halaman","Fitur, harga, testimoni, kontak","textarea"],["Fitur tambahan","Formulir, WhatsApp, analitik","textarea"]],
+"Website profil bisnis":[["Nama dan bidang bisnis","Nama usaha dan bidangnya","text"],["Halaman yang diperlukan","Tentang, layanan, portofolio, kontak","textarea"],["Fitur tambahan","Peta, blog, formulir","textarea"]],
+"Website custom":[["Tujuan website","Apa yang ingin dibuat","textarea"],["Fitur dan alur","Jelaskan kebutuhan secara rinci","textarea"],["Referensi","Tautan contoh","url"]],
+"Bot Telegram":[["Fungsi bot","Informasi, admin, game, atau otomasi","textarea"],["Perintah bot","Contoh: /start, /help","text"],["Integrasi","API, database, pembayaran","textarea"]],
+"Bot custom":[["Platform","Telegram, web, atau lainnya","text"],["Alur kerja","Jelaskan cara kerja yang dibutuhkan","textarea"],["Integrasi","API, database, layanan eksternal","textarea"]],
+"Undangan digital":[["Jenis acara","Pernikahan, ulang tahun, atau acara lain","text"],["Tanggal dan waktu","Tanggal serta jam acara","text"],["Lokasi","Alamat atau tautan peta","text"],["Fitur undangan","RSVP, galeri, musik, hitung mundur","textarea"]],
+"Tools dan otomatisasi":[["Proses saat ini","Pekerjaan yang ingin diotomatisasi","textarea"],["Alur yang diinginkan","Langkah awal sampai hasil akhir","textarea"],["Platform dan integrasi","Web, Telegram, API, spreadsheet","textarea"]],
+"Maintenance website":[["URL website","https://...","url"],["Masalah","Jelaskan masalah atau pesan error","textarea"],["Prioritas","Normal, segera, atau fleksibel","text"]],
+"Permintaan custom":[["Jenis proyek","Website, bot, integrasi, lainnya","text"],["Detail kebutuhan","Jelaskan hasil yang diharapkan","textarea"],["Catatan","Batasan atau kebutuhan khusus","textarea"]]
+};
+const $ = id => document.getElementById(id);
+const form=$("order-form"), product=$("product"), host=$("specific-fields"), summary=$("summary");
+const query=new URLSearchParams(location.search);
+const requested=query.get("product");
+if (defs[requested]) product.value=requested;
+
+function render(){
+ host.replaceChildren();
+ (defs[product.value]||[]).forEach(([name,placeholder,type],i)=>{
+  const id="extra-"+i, label=document.createElement("label");
+  label.htmlFor=id; label.textContent=name+" *";
+  const el=type==="textarea"?document.createElement("textarea"):document.createElement("input");
+  el.id=id; el.name=name; el.required=true; el.maxLength=1000; el.placeholder=placeholder;
+  if(type==="textarea") el.rows=2; else el.type=type;
+  host.append(label,el);
+ });
+ update();
+}
+function collect(){
+ const lines=["Produk: "+(product.value||"-")];
+ host.querySelectorAll("input,textarea").forEach(el=>lines.push(el.name+": "+(el.value.trim()||"-")));
+ lines.push("Nama: "+($("name").value.trim()||"-"));
+ lines.push("Kebutuhan: "+($("description").value.trim()||"-"));
+ lines.push("Referensi: "+($("reference").value.trim()||"-"));
+ lines.push("Anggaran: "+$("budget").value);
+ lines.push("Target waktu: "+($("deadline").value.trim()||"Belum ditentukan"));
+ return lines;
+}
+function update(){summary.textContent="RINGKASAN PESANAN\n\n"+collect().join("\n");}
+product.addEventListener("change",render);
+form.addEventListener("input",update);
+form.addEventListener("change",update);
+form.addEventListener("submit",e=>{
+ e.preventDefault();
+ if(!form.reportValidity()) return;
+ const msg=["Halo ARESTERdev! Saya ingin mengajukan pesanan.","",...collect(),"","Mohon informasi harga dan estimasi pengerjaan. Terima kasih."].join("\n");
+ location.href="https://wa.me/6281511585275?text="+encodeURIComponent(msg);
+});
+render();
+})();
+</script>
+</body></html>
