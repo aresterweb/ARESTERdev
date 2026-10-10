@@ -10,31 +10,122 @@
   async function loadPublic() {
     const host = $('#news-list');
     if (!host) return;
+    const featureHost = $('#an-featured');
+    const searchInput = $('#an-news-search');
+    const filterBar = $('#an-filterbar');
+    const empty = $('#an-empty');
+    const count = $('#an-result-count');
+    let allArticles = [];
+    let activeCategory = 'Semua';
+    let query = '';
+
+    const dateText = a => {
+      const value = a.published_at || a.created_at;
+      if (!value) return '';
+      const d = new Date(value);
+      return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'});
+    };
+    const articleUrl = a => `artikel.html?slug=${encodeURIComponent(a.slug || '')}`;
+    const searchable = a => [a.title,a.excerpt,a.content,a.category,a.author_name,a.location,a.tags].join(' ').toLocaleLowerCase('id-ID');
+    const safeCover = a => a.cover_url
+      ? `<img src="${esc(a.cover_url)}" alt="" loading="lazy" onerror="this.style.display='none'">`
+      : `<div class="an-feature-placeholder" aria-hidden="true">A<span style="color:#80aaff">N</span></div>`;
+
+    function render() {
+      const filtered = allArticles.filter(a => {
+        const categoryOK = activeCategory === 'Semua' ||
+          String(a.category || '').toLocaleLowerCase('id-ID').includes(activeCategory.toLocaleLowerCase('id-ID'));
+        const queryOK = !query || searchable(a).includes(query);
+        return categoryOK && queryOK;
+      });
+      const featured = filtered[0];
+      if (featureHost) {
+        if (featured) {
+          featureHost.innerHTML = `
+            <article class="an-feature-card">
+              <a class="an-feature-visual" href="${articleUrl(featured)}" aria-label="Baca ${esc(featured.title)}">${safeCover(featured)}</a>
+              <div class="an-feature-copy">
+                <p class="an-feature-label">${esc(featured.category || 'Sorotan redaksi')} · BERITA PILIHAN</p>
+                <h3>${esc(featured.title)}</h3>
+                <p class="an-feature-excerpt">${esc(featured.excerpt || 'Baca laporan lengkap dan informasi selengkapnya di ARESTERnews.')}</p>
+                <p class="an-feature-meta">${esc(dateText(featured))}${featured.author_name ? ' · Oleh ' + esc(featured.author_name) : ''}</p>
+                <a class="an-readmore" href="${articleUrl(featured)}">Baca berita pilihan <span aria-hidden="true">→</span></a>
+              </div>
+            </article>`;
+        } else {
+          featureHost.innerHTML = '<div class="an-loading">Belum ada berita unggulan yang cocok.</div>';
+        }
+      }
+      const rest = featured ? filtered.slice(1) : [];
+      host.innerHTML = rest.map(a => `
+        <article class="an-card">
+          ${a.cover_url ? `<img class="an-cover" src="${esc(a.cover_url)}" alt="" loading="lazy">` : ''}
+          <p class="an-date">${esc(dateText(a))}</p>
+          ${a.category ? `<p class="an-category">${esc(a.category)}</p>` : ''}
+          <h2>${esc(a.title)}</h2>
+          ${a.author_name ? `<p class="an-meta">Penulis: ${esc(a.author_name)}</p>` : ''}
+          <p>${esc(a.excerpt || '')}</p>
+          ${a.tags ? `<p class="an-meta">Topik: ${esc(a.tags)}</p>` : ''}
+          <a class="an-readmore" href="${articleUrl(a)}">Baca selengkapnya <span aria-hidden="true">→</span></a>
+        </article>`).join('');
+      if (empty) empty.hidden = filtered.length !== 0;
+      if (count) count.textContent = `${filtered.length} BERITA`;
+      if (host) host.hidden = rest.length === 0;
+    }
+
     host.textContent = 'Memuat berita…';
     const { data, error } = await client.from(table)
       .select('id,title,slug,excerpt,content,cover_url,published_at,created_at,category,author_name,location,tags,source_name,source_url')
       .eq('status', 'published')
       .order('published_at', { ascending: false });
+
     if (error) {
-      host.textContent = 'Berita belum dapat dimuat. Pastikan SQL Supabase sudah dijalankan.';
+      host.hidden = false;
+      host.textContent = 'Berita belum dapat dimuat. Pastikan konfigurasi dan kebijakan Supabase sudah benar.';
+      if (featureHost) featureHost.textContent = 'Berita unggulan belum dapat dimuat.';
+      if (count) count.textContent = 'BELUM TERSEDIA';
       return;
     }
-    if (!data.length) {
-      host.textContent = 'Belum ada berita yang diterbitkan.';
+
+    allArticles = data || [];
+    if (!allArticles.length) {
+      host.innerHTML = '';
+      host.hidden = true;
+      if (featureHost) featureHost.innerHTML = '<div class="an-loading">Belum ada berita yang diterbitkan. Berita yang sudah dipublikasikan akan muncul di sini.</div>';
+      if (count) count.textContent = '0 BERITA';
+      if (empty) empty.hidden = false;
       return;
     }
-    host.innerHTML = data.map(a => `
-      <article class="an-card">
-        ${a.cover_url ? `<img class="an-cover" src="${esc(a.cover_url)}" alt="" loading="lazy">` : ''}
-        <p class="an-date">${esc(new Date(a.published_at || a.created_at).toLocaleDateString('id-ID',{dateStyle:'long'}))}</p>
-        ${a.category ? `<p class="an-category">${esc(a.category)}</p>` : ''}
-        <h2>${esc(a.title)}</h2>
-        ${a.author_name ? `<p class="an-meta">Penulis: ${esc(a.author_name)}</p>` : ''}
-        ${a.location ? `<p class="an-meta">Lokasi: ${esc(a.location)}</p>` : ''}
-        <p>${esc(a.excerpt || '')}</p>
-        ${a.tags ? `<p class="an-meta">Topik: ${esc(a.tags)}</p>` : ''}
-        <a class="an-readmore" href="artikel.html?slug=${encodeURIComponent(a.slug || '')}">Baca selengkapnya →</a>
-      </article>`).join('');
+
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        query = searchInput.value.trim().toLocaleLowerCase('id-ID');
+        render();
+      });
+    }
+    if (filterBar) {
+      filterBar.addEventListener('click', e => {
+        const btn = e.target.closest('[data-filter]');
+        if (!btn) return;
+        activeCategory = btn.dataset.filter || 'Semua';
+        filterBar.querySelectorAll('[data-filter]').forEach(b => b.classList.toggle('is-active', b === btn));
+        render();
+      });
+    }
+    document.querySelectorAll('[data-category-link]').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const wanted = link.dataset.categoryLink || 'Semua';
+        activeCategory = wanted;
+        if (filterBar) {
+          const btn = [...filterBar.querySelectorAll('[data-filter]')].find(b => b.dataset.filter === wanted);
+          filterBar.querySelectorAll('[data-filter]').forEach(b => b.classList.toggle('is-active', b === btn));
+        }
+        render();
+        document.querySelector('#berita-terbaru')?.scrollIntoView({behavior:'smooth',block:'start'});
+      });
+    });
+    render();
   }
 
   async function initAdmin() {
