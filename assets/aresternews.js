@@ -287,60 +287,105 @@
       if (!error) await showSession();
     });
 
+    const saveButton = form.querySelector('button[type="submit"]');
     form.addEventListener('submit', async e => {
       e.preventDefault();
-      const {data:{session}} = await client.auth.getSession();
-      if (!session || (session.user.email || '').toLowerCase() !== cfg.adminEmail.toLowerCase()) {
-        tell('Silakan masuk menggunakan akun admin.'); return;
-      }
-      const fd = new FormData(form);
-      const title = String(fd.get('title')).trim();
-      const status = String(fd.get('status'));
-      const oldId = String(fd.get('id') || '');
-      const payload = {
-        title,
-        slug: slugify(title) + (oldId ? '' : '-' + Date.now().toString(36)),
-        excerpt: String(fd.get('excerpt') || '').trim(),
-        content: String(fd.get('content') || '').trim(),
-        category: String(fd.get('category') || 'Lainnya').trim(),
-        author_name: String(fd.get('author_name') || '').trim(),
-        location: String(fd.get('location') || '').trim(),
-        tags: String(fd.get('tags') || '').trim(),
-        source_name: String(fd.get('source_name') || '').trim(),
-        source_url: String(fd.get('source_url') || '').trim(),
-        cover_url: String(fd.get('cover_url') || '').trim(),
-        status,
-        author_email: cfg.adminEmail,
-        published_at: status === 'published' ? new Date().toISOString() : null,
-        updated_at: new Date().toISOString()
-      };
-      const selectedFile = coverFile.files && coverFile.files[0];
-      if (selectedFile) {
-        const { data: { session: uploadSession } } = await client.auth.getSession();
-        if (!uploadSession || (uploadSession.user.email || '').toLowerCase() !== cfg.adminEmail.toLowerCase()) {
-          tell('Sesi admin tidak valid. Silakan masuk kembali.'); return;
+      if (saveButton.disabled) return;
+      const originalButtonText = saveButton.textContent;
+      saveButton.disabled = true;
+      saveButton.textContent = 'Menyimpan…';
+      try {
+        clearMessage();
+        const { data: authData, error: authError } = await client.auth.getSession();
+        if (authError) throw new Error('Gagal memeriksa sesi: ' + authError.message);
+        const session = authData && authData.session;
+        if (!session || (session.user.email || '').toLowerCase() !== cfg.adminEmail.toLowerCase()) {
+          tell('Sesi admin tidak valid. Silakan masuk kembali.');
+          return;
         }
-        tell('Mengunggah gambar sampul…');
-        const ext = selectedFile.type === 'image/png' ? 'png' : selectedFile.type === 'image/webp' ? 'webp' : 'jpg';
-        const storagePath = `${Date.now()}-${Math.random().toString(36).slice(2,10)}.${ext}`;
-        const { error: uploadError } = await client.storage.from(bucketName).upload(storagePath, selectedFile, {
-          contentType: selectedFile.type, upsert: false, cacheControl: '3600'
-        });
-        if (uploadError) {
-          tell('Upload gagal: ' + uploadError.message + '. Pastikan bucket dan kebijakan Storage sudah dibuat.'); return;
+
+        const fd = new FormData(form);
+        const title = String(fd.get('title') || '').trim();
+        const content = String(fd.get('content') || '').trim();
+        if (!title || !content) {
+          tell('Judul dan isi berita wajib diisi.');
+          return;
         }
-        const { data: publicData } = client.storage.from(bucketName).getPublicUrl(storagePath);
-        payload.cover_url = publicData.publicUrl;
+        const status = String(fd.get('status') || 'draft');
+        const oldId = String(fd.get('id') || '');
+        const manualCoverUrl = String(fd.get('cover_url') || '').trim();
+        if (manualCoverUrl) {
+          try {
+            const u = new URL(manualCoverUrl);
+            if (!['http:', 'https:'].includes(u.protocol)) throw new Error();
+          } catch (_) {
+            tell('URL gambar sampul harus diawali http:// atau https://.');
+            return;
+          }
+        }
+
+        const payload = {
+          title,
+          slug: slugify(title) + (oldId ? '' : '-' + Date.now().toString(36)),
+          excerpt: String(fd.get('excerpt') || '').trim(),
+          content,
+          category: String(fd.get('category') || 'Lainnya').trim(),
+          author_name: String(fd.get('author_name') || '').trim(),
+          location: String(fd.get('location') || '').trim(),
+          tags: String(fd.get('tags') || '').trim(),
+          source_name: String(fd.get('source_name') || '').trim(),
+          source_url: String(fd.get('source_url') || '').trim(),
+          cover_url: manualCoverUrl,
+          status,
+          author_email: cfg.adminEmail,
+          published_at: status === 'published' ? new Date().toISOString() : null,
+          updated_at: new Date().toISOString()
+        };
+
+        const selectedFile = coverFile.files && coverFile.files[0];
+        if (selectedFile) {
+          if (!['image/jpeg','image/png','image/webp'].includes(selectedFile.type)) {
+            tell('Format gambar tidak didukung. Gunakan JPG, PNG, atau WebP.');
+            return;
+          }
+          if (selectedFile.size > 5 * 1024 * 1024) {
+            tell('Ukuran gambar maksimal 5 MB.');
+            return;
+          }
+          tell('Mengunggah gambar sampul…');
+          const ext = selectedFile.type === 'image/png' ? 'png' : selectedFile.type === 'image/webp' ? 'webp' : 'jpg';
+          const storagePath = `${Date.now()}-${Math.random().toString(36).slice(2,10)}.${ext}`;
+          const { error: uploadError } = await client.storage.from(bucketName).upload(storagePath, selectedFile, {
+            contentType: selectedFile.type, upsert: false, cacheControl: '3600'
+          });
+          if (uploadError) {
+            throw new Error('Upload gambar gagal: ' + uploadError.message + '. Periksa bucket dan kebijakan Storage Supabase.');
+          }
+          const { data: publicData } = client.storage.from(bucketName).getPublicUrl(storagePath);
+          if (!publicData || !publicData.publicUrl) throw new Error('Upload selesai, tetapi URL publik gambar tidak tersedia.');
+          payload.cover_url = publicData.publicUrl;
+        }
+
+        tell('Menyimpan berita ke Supabase…');
+        let result;
+        if (oldId) {
+          delete payload.slug;
+          result = await client.from(table).update(payload).eq('id', oldId).select('id').maybeSingle();
+        } else {
+          result = await client.from(table).insert(payload).select('id').single();
+        }
+        if (result.error) throw new Error('Supabase menolak penyimpanan: ' + result.error.message);
+        if (!result.data) throw new Error('Tidak ada baris yang tersimpan/diubah. Periksa kebijakan RLS dan izin akun admin.');
+        tell('Berita berhasil disimpan.');
+        clearForm();
+        await refresh();
+      } catch (err) {
+        console.error('[ARESTERnews] Gagal menyimpan berita:', err);
+        tell('Gagal menyimpan: ' + (err && err.message ? err.message : String(err)));
+      } finally {
+        saveButton.disabled = false;
+        saveButton.textContent = originalButtonText;
       }
-      let result;
-      if (oldId) {
-        delete payload.slug;
-        result = await client.from(table).update(payload).eq('id',oldId);
-      } else {
-        result = await client.from(table).insert(payload);
-      }
-      tell(result.error ? result.error.message : 'Berita berhasil disimpan.');
-      if (!result.error) { clearForm(); await refresh(); }
     });
 
     $('#an-clear').addEventListener('click', clearForm);
