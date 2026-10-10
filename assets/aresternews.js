@@ -39,7 +39,7 @@
     root.innerHTML = `
       <section class="an-panel">
         <h2>Masuk Admin</h2>
-        <p>Akses hanya untuk ${esc(cfg.adminEmail)}.</p>
+        <p>Masuk menggunakan akun admin yang diizinkan.</p>
         <form id="an-login">
           <label>Email<input name="email" type="email" autocomplete="username" required></label>
           <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
