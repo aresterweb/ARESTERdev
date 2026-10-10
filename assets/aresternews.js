@@ -51,11 +51,31 @@
         <div class="an-actions"><h2>Kelola Berita</h2><button id="an-logout" type="button">Keluar</button></div>
         <form id="an-form">
           <input name="id" type="hidden">
-          <label>Judul<input name="title" maxlength="180" required></label>
-          <label>Ringkasan<textarea name="excerpt" rows="3" maxlength="500"></textarea></label>
-          <label>Isi berita<textarea name="content" rows="10" required></textarea></label>
-          <label>URL gambar (opsional)<input name="cover_url" type="url" placeholder="https://..."></label>
-          <label>Status<select name="status"><option value="draft">Draft</option><option value="published">Terbitkan</option></select></label>
+          <label>Judul berita *<input name="title" maxlength="180" required placeholder="Judul yang jelas dan faktual"></label>
+          <label>Kategori
+            <select name="category">
+              <option value="Teknologi">Teknologi</option>
+              <option value="AI">AI & Kecerdasan Buatan</option>
+              <option value="Bisnis">Bisnis</option>
+              <option value="Keuangan">Keuangan & Pasar</option>
+              <option value="Trading">Trading & Kripto</option>
+              <option value="Sains">Sains</option>
+              <option value="Keamanan Siber">Keamanan Siber</option>
+              <option value="Indonesia">Berita Indonesia</option>
+              <option value="Dunia">Berita Dunia</option>
+              <option value="Lainnya">Lainnya</option>
+            </select>
+          </label>
+          <label>Nama penulis / editor<input name="author_name" maxlength="120" placeholder="Nama penulis atau tim redaksi"></label>
+          <label>Lokasi / wilayah terkait<input name="location" maxlength="160" placeholder="Contoh: Jakarta, Indonesia"></label>
+          <label>Tag / topik<input name="tags" maxlength="300" placeholder="AI, teknologi, startup (pisahkan dengan koma)"></label>
+          <label>Ringkasan berita<textarea name="excerpt" rows="3" maxlength="500" placeholder="Inti berita dalam 1–3 kalimat"></textarea></label>
+          <label>Isi berita lengkap *<textarea name="content" rows="12" required placeholder="Apa yang terjadi? Siapa yang terlibat? Kapan dan di mana? Mengapa penting? Apa dampaknya?"></textarea></label>
+          <label>Nama sumber berita<input name="source_name" maxlength="180" placeholder="Contoh: nama media, situs resmi, atau lembaga"></label>
+          <label>URL sumber asli<input name="source_url" type="url" placeholder="https://..."></label>
+          <label>URL gambar sampul<input name="cover_url" type="url" placeholder="https://..."></label>
+          <label>Status publikasi<select name="status"><option value="draft">Simpan sebagai draft</option><option value="published">Terbitkan sekarang</option></select></label>
+          <p>Pastikan fakta, tanggal, dan sumber diperiksa sebelum berita diterbitkan.</p>
           <div class="an-actions"><button type="submit">Simpan berita</button><button id="an-clear" type="button">Berita baru</button></div>
         </form>
         <h3>Daftar berita</h3><div id="an-items">Memuat…</div>
@@ -64,6 +84,7 @@
     const msg = $('#an-msg');
     const editor = $('#an-editor');
     const login = $('#an-login');
+    const loginPanel = login.closest('.an-panel');
     const form = $('#an-form');
 
     function tell(s) { msg.textContent = s; }
@@ -107,7 +128,7 @@
     async function showSession() {
       const {data:{session}} = await client.auth.getSession();
       const valid = session && (session.user.email || '').toLowerCase() === cfg.adminEmail.toLowerCase();
-      login.hidden = !!valid;
+      loginPanel.hidden = !!valid;
       editor.hidden = !valid;
       if (session && !valid) {
         await client.auth.signOut();
@@ -146,6 +167,12 @@
         slug: slugify(title) + (oldId ? '' : '-' + Date.now().toString(36)),
         excerpt: String(fd.get('excerpt') || '').trim(),
         content: String(fd.get('content') || '').trim(),
+        category: String(fd.get('category') || 'Lainnya').trim(),
+        author_name: String(fd.get('author_name') || '').trim(),
+        location: String(fd.get('location') || '').trim(),
+        tags: String(fd.get('tags') || '').trim(),
+        source_name: String(fd.get('source_name') || '').trim(),
+        source_url: String(fd.get('source_url') || '').trim(),
         cover_url: String(fd.get('cover_url') || '').trim(),
         status,
         author_email: cfg.adminEmail,
