@@ -44,7 +44,7 @@
 <option value="">Pilih layanan</option>
 <option>Landing page</option><option>Website profil bisnis</option><option>Website custom</option>
 <option>Bot Telegram</option><option>Bot custom</option><option>Undangan digital</option>
-<option>Tools dan otomatisasi</option><option>Maintenance website</option><option>Permintaan custom</option>
+<option>Tools dan otomatisasi</option><option>Maintenance website</option><option>Permintaan custom</option><option>Login Page MikroTik</option>
 </select>
 <div id="specific-fields"></div>
 <label for="name">Nama pemesan *</label><input id="name" required maxlength="100" autocomplete="name" placeholder="Nama kamu">
@@ -55,6 +55,7 @@
 </select>
 <label for="deadline">Target waktu (opsional)</label><input id="deadline" maxlength="100" placeholder="Contoh: fleksibel">
 <div id="summary" class="order-summary" aria-live="polite"></div>
+<p class="small-note">Untuk layanan MikroTik, jangan masukkan kata sandi admin, secret RADIUS, atau kredensial produksi ke formulir. Detail akses dibahas melalui cara yang aman setelah ruang lingkup disepakati.</p>
 <button class="button" type="submit">Lanjutkan ke WhatsApp ↗</button>
 <p class="small-note">WhatsApp terbuka dengan pesan siap kirim. Periksa lalu tekan Kirim.</p>
 <a href="products.html">← Kembali ke katalog</a>
@@ -73,6 +74,15 @@ const defs = {
 "Undangan digital":[["Jenis acara","Pernikahan, ulang tahun, atau acara lain","text"],["Tanggal dan waktu","Tanggal serta jam acara","text"],["Lokasi","Alamat atau tautan peta","text"],["Fitur undangan","RSVP, galeri, musik, hitung mundur","textarea"]],
 "Tools dan otomatisasi":[["Proses saat ini","Pekerjaan yang ingin diotomatisasi","textarea"],["Alur yang diinginkan","Langkah awal sampai hasil akhir","textarea"],["Platform dan integrasi","Web, Telegram, API, spreadsheet","textarea"]],
 "Maintenance website":[["URL website","https://...","url"],["Masalah","Jelaskan masalah atau pesan error","textarea"],["Prioritas","Normal, segera, atau fleksibel","text"]],
+"Login Page MikroTik":[
+ ["Model perangkat / RouterOS","Contoh: hAP ac2, RouterOS v7","text"],
+ ["Kebutuhan halaman login","Brand, warna, logo, bahasa, informasi yang ditampilkan","textarea"],
+ ["Fitur hotspot","Voucher, paket, masa aktif, batas kecepatan, atau lainnya","textarea"],
+ ["Metode autentikasi","Hotspot lokal, RADIUS, atau sistem yang sudah digunakan","text"],
+ ["Referensi desain","URL contoh atau tautan aset milikmu","url"],
+ ["Status konfigurasi","Baru, sudah berjalan, atau perlu diperbaiki","text"]
+],
+
 "Permintaan custom":[["Jenis proyek","Website, bot, integrasi, lainnya","text"],["Detail kebutuhan","Jelaskan hasil yang diharapkan","textarea"],["Catatan","Batasan atau kebutuhan khusus","textarea"]]
 };
 const $ = id => document.getElementById(id);
