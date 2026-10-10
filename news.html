@@ -15,6 +15,35 @@
 .an-date{opacity:.7;font-size:.9rem}.an-card summary{cursor:pointer;margin-top:14px}.an-content{white-space:normal;overflow-wrap:anywhere;margin-top:12px}
 .an-footer{margin:42px 0 20px;opacity:.75}.an-nav{display:flex;gap:14px;flex-wrap:wrap;margin:18px 0}
 </style>
+
+<style id="aresternews-professional">
+/* ARESTERnews — editorial redesign */
+:root{--news-line:rgba(157,190,220,.16);--news-muted:#9eafc4;--news-cyan:#69def7}
+body{background:radial-gradient(ellipse at 50% 0%,rgba(22,85,125,.18),transparent 38%),#070b17}
+.an-wrap{width:min(1160px,calc(100% - 40px));max-width:1160px;margin:0 auto;padding:0 0 70px}
+.an-intro{position:relative;padding:66px 0 38px;margin-bottom:30px;border-bottom:1px solid var(--news-line)}
+.an-intro>p:first-child{display:flex;align-items:center;gap:10px;color:var(--news-cyan);font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px}
+.an-intro>p:first-child:before{content:"";width:25px;height:2px;background:var(--news-cyan)}
+.an-intro h1{font-size:clamp(42px,7vw,76px);line-height:1;letter-spacing:-.06em;margin:0 0 18px;background:linear-gradient(100deg,#fff 25%,#70def6 75%,#80aaff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.an-intro>p:last-child{font-size:16px;color:var(--news-muted);max-width:600px;line-height:1.8;margin:0}
+#news-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;align-items:stretch}
+.an-card{min-width:0;overflow:hidden;padding:0!important;border:1px solid var(--news-line)!important;border-radius:18px!important;background:linear-gradient(155deg,rgba(16,31,49,.96),rgba(8,17,30,.96))!important;box-shadow:0 10px 30px rgba(0,0,0,.12);transition:transform .25s,border-color .25s,box-shadow .25s}
+.an-card:hover{transform:translateY(-4px);border-color:rgba(105,222,247,.45)!important;box-shadow:0 20px 44px rgba(0,0,0,.24)}
+.an-cover{width:100%;height:210px;max-height:none;object-fit:cover;border-radius:0!important;background:#101b2b}
+.an-card>p,.an-card>h2,.an-card>a{margin-left:22px;margin-right:22px}
+.an-card>.an-date{margin-top:21px;margin-bottom:8px;font-size:12px;color:#8fa3ba}
+.an-category{display:inline-flex;width:max-content;max-width:calc(100% - 44px);padding:4px 10px;margin-top:8px!important;margin-bottom:8px!important;border:1px solid rgba(105,222,247,.22);border-radius:5px;background:rgba(48,157,194,.09);color:#7ce4f8;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}
+.an-card h2{font-size:clamp(20px,2vw,25px);line-height:1.3;letter-spacing:-.025em;margin-top:9px!important;margin-bottom:12px!important}
+.an-card>p:not(.an-date):not(.an-category):not(.an-meta){font-size:14px;line-height:1.8;color:#b2c0d1}
+.an-meta{margin-top:5px;margin-bottom:7px;font-size:12px;color:#899bb1}
+.an-readmore{display:inline-flex;align-items:center;gap:9px;margin-top:9px!important;margin-bottom:23px!important;padding:10px 0;color:#78e1f7;font-size:13px;font-weight:750}
+.an-readmore:hover{color:#fff}
+.an-footer{margin-top:45px;padding-top:23px;border-top:1px solid var(--news-line);font-size:13px;color:var(--news-muted)}
+.an-footer a:hover{color:var(--news-cyan)}
+@media(max-width:900px){#news-list{grid-template-columns:repeat(2,minmax(0,1fr))}.an-cover{height:190px}}
+@media(max-width:600px){.an-wrap{width:calc(100% - 32px)}.an-intro{padding:45px 0 28px;margin-bottom:22px}.an-intro>p:last-child{font-size:14px}#news-list{grid-template-columns:1fr;gap:17px}.an-cover{height:220px}.an-card h2{font-size:23px}.an-card>p,.an-card>h2,.an-card>a{margin-left:18px;margin-right:18px}.an-card>.an-date{margin-top:17px}.an-readmore{margin-bottom:18px!important}}
+</style>
+
 </head>
 <body>
 <header class="site-header"><div class="container nav-wrap">
@@ -28,6 +57,6 @@
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/aresternews-config.js"></script>
-<script src="assets/aresternews.js?v=20261010-article1"></script>
+<script src="assets/aresternews.js?v=20261010-pro3"></script>
 </body>
 </html>

@@ -19,6 +19,30 @@
 .article-source{border-top:1px solid #24435c;margin-top:30px;padding-top:18px}
 .article-status{padding:24px 0}
 </style>
+
+<style id="arester-article-professional">
+/* ARESTERnews — long-form editorial reading experience */
+:root{--article-line:rgba(157,190,220,.17);--article-muted:#a4b4c8;--article-cyan:#70def7}
+body{background:radial-gradient(ellipse at 50% 0%,rgba(19,85,126,.18),transparent 34%),#070b17}
+.article-wrap{width:min(920px,calc(100% - 40px));max-width:920px;margin:0 auto;padding:26px 0 90px}
+.article-back{display:inline-flex;align-items:center;gap:10px;margin:10px 0 30px;padding:9px 14px;border:1px solid var(--article-line);border-radius:999px;color:#c2d1e1;font-size:12px;font-weight:650;transition:border-color .2s,color .2s}
+.article-back:hover{border-color:rgba(112,222,247,.55);color:var(--article-cyan)}
+.article-panel{padding:clamp(22px,5vw,58px)!important;border:1px solid var(--article-line)!important;border-radius:22px!important;background:linear-gradient(155deg,rgba(13,27,44,.97),rgba(7,15,27,.98))!important;box-shadow:0 25px 80px rgba(0,0,0,.23)}
+.article-category{display:inline-flex;align-items:center;padding:6px 11px;margin:0 0 18px;border:1px solid rgba(112,222,247,.25);border-radius:5px;background:rgba(44,151,189,.09);color:var(--article-cyan)!important;font-size:10px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
+.article-title{font-size:clamp(32px,6vw,60px)!important;line-height:1.09!important;letter-spacing:-.048em!important;font-weight:760!important;margin:0 0 23px!important;color:#f4f8fc}
+.article-meta{font-size:12px!important;line-height:1.9!important;color:var(--article-muted)!important}
+.article-cover{width:100%;max-height:540px;object-fit:cover;border-radius:13px!important;margin:30px 0!important;border:1px solid var(--article-line)}
+.article-panel>p>strong{display:block;margin:5px 0 28px;color:#d9e5f1;font-size:clamp(17px,2.5vw,21px);line-height:1.75;font-weight:500}
+.article-body{max-width:720px;margin:28px auto 0;font-size:17px!important;line-height:2!important;letter-spacing:.002em;color:#d0dbe8;overflow-wrap:anywhere}
+.article-body br{content:"";display:block;margin-bottom:12px}
+.article-source{max-width:720px;margin:42px auto 0!important;padding:22px 0 0!important;border-top:1px solid var(--article-line)!important;color:#9eafc4;font-size:13px;line-height:1.8}
+.article-source strong{display:block;margin-bottom:5px;color:#e4edf7;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.article-source a{color:var(--article-cyan);text-decoration:underline;text-decoration-color:rgba(112,222,247,.35);text-underline-offset:4px}
+.article-status{padding:32px 0;color:var(--article-muted)}
+.article-panel>.article-meta:last-child{margin-top:25px}
+@media(max-width:600px){.article-wrap{width:calc(100% - 28px);padding-top:14px}.article-back{margin-bottom:20px}.article-panel{padding:22px 19px!important;border-radius:16px!important}.article-title{font-size:clamp(31px,9vw,43px)!important}.article-cover{margin:23px 0!important;border-radius:9px!important}.article-body{font-size:16px!important;line-height:1.9!important}}
+</style>
+
 </head>
 <body>
 <header class="site-header"><div class="container nav-wrap">
