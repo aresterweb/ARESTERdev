@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ARESTERnews — Berita & Pembaruan</title>
+<meta name="description" content="Berita, pembaruan, dan informasi terbaru dari ARESTERdev.">
+<link rel="icon" href="assets/aresterdev-logo-original.png">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.an-wrap{max-width:1000px;margin:48px auto;padding:0 20px}.an-intro{margin-bottom:28px}
+#news-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:20px}
+.an-card,.an-panel{border:1px solid #24435c;border-radius:16px;padding:22px;background:rgba(8,27,43,.78);color:inherit}
+.an-card h2{margin:.4em 0}.an-cover{width:100%;max-height:260px;object-fit:cover;border-radius:10px}
+.an-date{opacity:.7;font-size:.9rem}.an-card summary{cursor:pointer;margin-top:14px}.an-content{white-space:normal;overflow-wrap:anywhere;margin-top:12px}
+.an-footer{margin:42px 0 20px;opacity:.75}.an-nav{display:flex;gap:14px;flex-wrap:wrap;margin:18px 0}
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container nav-wrap">
+<a href="index.html" aria-label="ARESTERdev Home"><img src="assets/aresterdev-logo-original.png" alt="ARESTERdev" style="width:44px;height:44px;object-fit:contain"></a>
+<nav class="main-nav" aria-label="Navigasi berita"><a href="index.html">Home</a><a href="blog/index.html">Artikel</a><a class="active" href="news.html">ARESTERnews</a></nav>
+</div></header>
+<main class="an-wrap">
+<div class="an-intro"><p>ARESTERdev</p><h1>ARESTERnews</h1><p>Berita, pengumuman, dan pembaruan terbaru.</p></div>
+<div id="news-list" aria-live="polite">Memuat berita…</div>
+<p class="an-footer"><a href="index.html">Kembali ke ARESTERdev</a></p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/aresternews-config.js"></script>
+<script src="assets/aresternews.js"></script>
+</body>
+</html>

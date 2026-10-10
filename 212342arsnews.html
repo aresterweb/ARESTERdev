@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ARESTERnews Admin</title>
+<link rel="icon" href="assets/aresterdev-logo-original.png">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.an-wrap{max-width:900px;margin:40px auto;padding:0 18px}.an-panel{border:1px solid #24435c;border-radius:16px;padding:22px;margin:20px 0;background:rgba(8,27,43,.82)}
+.an-panel label{display:block;margin:14px 0}.an-panel input,.an-panel textarea,.an-panel select{display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:12px;border:1px solid #35556b;border-radius:8px;background:#071b2b;color:inherit;font:inherit}
+.an-panel button{padding:10px 15px;margin:5px 5px 5px 0;cursor:pointer}.an-actions{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.an-item{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 0;border-bottom:1px solid #24435c}.an-item strong{flex:1;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container nav-wrap">
+<a href="index.html"><img src="assets/aresterdev-logo-original.png" alt="ARESTERdev" style="width:44px;height:44px;object-fit:contain"></a>
+<nav class="main-nav"><a href="index.html">Home</a><a href="news.html">Lihat ARESTERnews</a></nav>
+</div></header>
+<main class="an-wrap">
+<h1>ARESTERnews Admin</h1>
+<p>Masuk menggunakan akun admin Supabase yang diizinkan.</p>
+<div id="admin-app"></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/aresternews-config.js"></script>
+<script src="assets/aresternews.js"></script>
+</body>
+</html>
