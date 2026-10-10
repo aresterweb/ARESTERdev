@@ -12,7 +12,7 @@
     if (!host) return;
     host.textContent = 'Memuat berita…';
     const { data, error } = await client.from(table)
-      .select('id,title,slug,excerpt,content,cover_url,published_at,created_at')
+      .select('id,title,slug,excerpt,content,cover_url,published_at,created_at,category,author_name,location,tags,source_name,source_url')
       .eq('status', 'published')
       .order('published_at', { ascending: false });
     if (error) {
@@ -27,9 +27,13 @@
       <article class="an-card">
         ${a.cover_url ? `<img class="an-cover" src="${esc(a.cover_url)}" alt="" loading="lazy">` : ''}
         <p class="an-date">${esc(new Date(a.published_at || a.created_at).toLocaleDateString('id-ID',{dateStyle:'long'}))}</p>
+        ${a.category ? `<p class="an-category">${esc(a.category)}</p>` : ''}
         <h2>${esc(a.title)}</h2>
+        ${a.author_name ? `<p class="an-meta">Penulis: ${esc(a.author_name)}</p>` : ''}
+        ${a.location ? `<p class="an-meta">Lokasi: ${esc(a.location)}</p>` : ''}
         <p>${esc(a.excerpt || '')}</p>
-        <details><summary>Baca selengkapnya</summary><div class="an-content">${esc(a.content).replace(/\n/g,'<br>')}</div></details>
+        ${a.tags ? `<p class="an-meta">Topik: ${esc(a.tags)}</p>` : ''}
+        <a class="an-readmore" href="artikel.html?slug=${encodeURIComponent(a.slug || '')}">Baca selengkapnya →</a>
       </article>`).join('');
   }
 

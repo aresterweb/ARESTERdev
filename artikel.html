@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Berita — ARESTERnews</title>
+<meta name="description" content="Baca berita lengkap dari ARESTERnews.">
+<link rel="icon" href="assets/aresterdev-logo-original.png">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.article-wrap{max-width:850px;margin:42px auto;padding:0 20px}
+.article-back{display:inline-block;margin:12px 0 24px}
+.article-panel{border:1px solid #24435c;border-radius:18px;padding:clamp(20px,4vw,42px);background:rgba(8,27,43,.78)}
+.article-category{display:inline-block;color:#72d7ff;font-weight:700}
+.article-title{font-size:clamp(2rem,6vw,3.4rem);line-height:1.12;margin:.35em 0}
+.article-meta{opacity:.75;font-size:.95rem;line-height:1.8}
+.article-cover{display:block;width:100%;max-height:480px;object-fit:cover;border-radius:12px;margin:26px 0}
+.article-body{font-size:1.08rem;line-height:1.9;overflow-wrap:anywhere;white-space:pre-wrap}
+.article-source{border-top:1px solid #24435c;margin-top:30px;padding-top:18px}
+.article-status{padding:24px 0}
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container nav-wrap">
+<a href="index.html" aria-label="ARESTERdev Home"><img src="assets/aresterdev-logo-original.png" alt="ARESTERdev" style="width:44px;height:44px;object-fit:contain"></a>
+<nav class="main-nav" aria-label="Navigasi berita"><a href="index.html">Home</a><a href="blog/index.html">Artikel</a><a class="active" href="news.html">ARESTERnews</a></nav>
+</div></header>
+<main class="article-wrap">
+<a class="article-back" href="news.html">← Kembali ke ARESTERnews</a>
+<div id="article-result" class="article-status" aria-live="polite">Memuat artikel…</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/aresternews-config.js?v=20261010-article1"></script>
+<script>
+(() => {
+  const host = document.getElementById('article-result');
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[c]);
+  document.addEventListener('DOMContentLoaded', async () => {
+    const cfg = window.ARESTERNEWS_CONFIG;
+    if (!cfg || !window.supabase) {
+      host.textContent = 'Konfigurasi berita belum tersedia.';
+      return;
+    }
+    const slug = new URLSearchParams(location.search).get('slug');
+    if (!slug) {
+      host.textContent = 'Artikel tidak ditemukan. Silakan pilih berita dari halaman ARESTERnews.';
+      return;
+    }
+    const client = window.supabase.createClient(cfg.url, cfg.key);
+    const {data:a,error} = await client.from('aresternews_articles')
+      .select('title,slug,excerpt,content,cover_url,published_at,created_at,category,author_name,location,tags,source_name,source_url')
+      .eq('slug', slug).eq('status','published').maybeSingle();
+    if (error || !a) {
+      host.textContent = 'Artikel tidak ditemukan atau belum diterbitkan.';
+      return;
+    }
+    const date = new Date(a.published_at || a.created_at);
+    host.className = 'article-panel';
+    host.innerHTML = `
+      ${a.category ? `<p class="article-category">${esc(a.category)}</p>` : ''}
+      <h1 class="article-title">${esc(a.title)}</h1>
+      <p class="article-meta">
+        ${esc(date.toLocaleDateString('id-ID',{dateStyle:'long'}))}
+        ${a.author_name ? ` · Penulis: ${esc(a.author_name)}` : ''}
+        ${a.location ? ` · ${esc(a.location)}` : ''}
+      </p>
+      ${a.cover_url ? `<img class="article-cover" src="${esc(a.cover_url)}" alt="Gambar: ${esc(a.title)}">` : ''}
+      ${a.excerpt ? `<p><strong>${esc(a.excerpt)}</strong></p>` : ''}
+      <div class="article-body">${esc(a.content).replace(/\n/g,'<br>')}</div>
+      ${a.tags ? `<p class="article-meta">Topik: ${esc(a.tags)}</p>` : ''}
+      ${a.source_name ? `<div class="article-source"><strong>Sumber berita:</strong> ${a.source_url ? `<a href="${esc(a.source_url)}" target="_blank" rel="noopener noreferrer">${esc(a.source_name)}</a>` : esc(a.source_name)}</div>` : ''}
+    `;
+    document.title = a.title + ' — ARESTERnews';
+  });
+})();
+</script>
+</body>
+</html>
