@@ -97,3 +97,108 @@ body.is-loading{overflow:hidden}
   background:var(--panel);color:var(--text);font:inherit
 }
 .product-specific-fields textarea{resize:vertical}
+
+
+/* ARESTER_PORTFOLIO_V1 */
+.portfolio-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:22px;
+}
+.portfolio-project{
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:22px;
+  background:var(--panel);
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+.portfolio-project-top{
+  min-height:145px;
+  padding:24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  border-bottom:1px solid var(--line);
+}
+.portfolio-tone-web{
+  background:radial-gradient(ellipse at 80% 20%,rgba(82,170,255,.2),transparent 60%),var(--bg-2);
+}
+.portfolio-tone-ai{
+  background:radial-gradient(ellipse at 80% 20%,rgba(164,115,255,.24),transparent 60%),var(--bg-2);
+}
+.portfolio-tone-bot{
+  background:radial-gradient(ellipse at 80% 20%,rgba(64,225,199,.18),transparent 60%),var(--bg-2);
+}
+.portfolio-tone-invite{
+  background:radial-gradient(ellipse at 80% 20%,rgba(242,190,153,.24),transparent 60%),var(--bg-2);
+}
+.portfolio-project-symbol{
+  font-size:clamp(38px,6vw,60px);
+  font-weight:800;
+  letter-spacing:-.06em;
+  color:var(--text);
+}
+.portfolio-project-type{
+  font-size:10px;
+  letter-spacing:.16em;
+  font-weight:750;
+  color:var(--muted);
+  text-align:right;
+}
+.portfolio-project-body{
+  padding:clamp(20px,3vw,30px);
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:12px;
+  height:100%;
+}
+.portfolio-project-body h2{
+  margin:0;
+  font-size:clamp(22px,3vw,29px);
+}
+.portfolio-project-body p{margin:0}
+.portfolio-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  list-style:none;
+  margin:4px 0 12px;
+  padding:0;
+}
+.portfolio-tags li{
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:11px;
+  color:var(--muted);
+}
+.portfolio-project-link{margin-top:auto}
+.portfolio-disclaimer{
+  margin-top:24px;
+  padding:22px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:var(--bg-2);
+}
+.portfolio-disclaimer p:last-child{margin-bottom:0}
+.portfolio-contact{
+  margin-top:28px;
+  padding:clamp(22px,4vw,38px);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  border:1px solid var(--line);
+  border-radius:22px;
+  background:var(--panel);
+}
+.portfolio-contact h2{margin:0 0 10px}
+.portfolio-contact p{margin-bottom:0}
+@media(max-width:650px){
+  .portfolio-grid{grid-template-columns:1fr}
+  .portfolio-contact{align-items:flex-start;flex-direction:column}
+}
