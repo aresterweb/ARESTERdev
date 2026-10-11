@@ -80,12 +80,39 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(19,85,126,.18),transparen
     }
     const client = window.supabase.createClient(cfg.url, cfg.key);
     const {data:a,error} = await client.from('aresternews_articles')
-      .select('title,slug,excerpt,content,cover_url,published_at,created_at,category,author_name,location,tags,source_name,source_url')
+      .select('id,title,slug,excerpt,content,cover_url,published_at,created_at,category,author_name,location,tags,source_name,source_url')
       .eq('slug', slug).eq('status','published').maybeSingle();
     if (error || !a) {
       host.textContent = 'Artikel tidak ditemukan atau belum diterbitkan.';
       return;
     }
+
+    // ARESTER_ARTICLE_VIEWS_V1
+    let viewCount = null;
+    const sessionKey = 'aresternews_viewed_' + a.id;
+    let alreadyCounted = false;
+    try { alreadyCounted = sessionStorage.getItem(sessionKey) === '1'; } catch (_) {}
+
+    if (!alreadyCounted) {
+      const {data: counted, error: countError} = await client.rpc(
+        'record_aresternews_article_view',
+        {p_article_id: a.id}
+      );
+      if (!countError && counted !== null && counted !== undefined) {
+        viewCount = Number(counted);
+        try { sessionStorage.setItem(sessionKey, '1'); } catch (_) {}
+      }
+    }
+
+    if (viewCount === null) {
+      const {data: viewRow} = await client
+        .from('aresternews_article_views')
+        .select('view_count')
+        .eq('article_id', a.id)
+        .maybeSingle();
+      if (viewRow) viewCount = Number(viewRow.view_count);
+    }
+
     const date = new Date(a.published_at || a.created_at);
     host.className = 'article-panel';
     host.innerHTML = `
@@ -96,6 +123,7 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(19,85,126,.18),transparen
         ${a.author_name ? ` · Penulis: ${esc(a.author_name)}` : ''}
         ${a.location ? ` · ${esc(a.location)}` : ''}
       </p>
+      <p class="article-view-count" aria-live="polite">Tayangan: ${viewCount === null || !Number.isFinite(viewCount) ? 'Belum tersedia' : viewCount.toLocaleString('id-ID')}</p>
       ${a.cover_url ? `<img class="article-cover" src="${esc(a.cover_url)}" alt="Gambar: ${esc(a.title)}">` : ''}
       ${a.excerpt ? `<p><strong>${esc(a.excerpt)}</strong></p>` : ''}
       <div class="article-body">${esc(a.content).replace(/\n/g,'<br>')}</div>

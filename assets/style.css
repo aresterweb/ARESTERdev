@@ -217,3 +217,19 @@ body.is-loading{overflow:hidden}
   .an-actions{display:flex;flex-wrap:wrap;gap:8px}
   .an-actions button,#an-editor button{min-height:42px;max-width:100%}
 }
+
+
+/* ARESTER_ARTICLE_VIEWS_V1 */
+.article-view-count{
+  margin:8px 0 20px;
+  color:#9eb5ca;
+  font-size:12px;
+  letter-spacing:.02em
+}
+.an-view-count{
+  display:inline-block;
+  margin:6px 10px 6px 0;
+  color:#70def7;
+  font-size:12px;
+  font-weight:650
+}

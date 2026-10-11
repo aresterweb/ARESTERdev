@@ -225,11 +225,22 @@
       const items = $('#an-items');
       items.replaceChildren();
       if (!data.length) { items.textContent = 'Belum ada berita.'; return; }
+
+      // ARESTER_ADMIN_VIEWS_V1
+      const {data: viewRows, error: viewsError} = await client
+        .from('aresternews_article_views')
+        .select('article_id,view_count');
+      const viewMap = new Map((viewsError ? [] : (viewRows || []))
+        .map(v => [v.article_id, Number(v.view_count) || 0]));
+
       data.forEach(a => {
         const row = document.createElement('div');
         row.className = 'an-item';
         const title = document.createElement('strong');
         title.textContent = `${a.title} (${a.status})`;
+        const views = document.createElement('span');
+        views.className = 'an-view-count';
+        views.textContent = `Tayangan: ${(viewMap.get(a.id) || 0).toLocaleString('id-ID')}`;
         const edit = document.createElement('button');
         edit.type = 'button'; edit.textContent = 'Edit';
         edit.addEventListener('click', () => {
@@ -248,7 +259,7 @@
           tell(error ? error.message : 'Berita dihapus.');
           if (!error) refresh();
         });
-        row.append(title, edit, del); items.append(row);
+        row.append(title, views, edit, del); items.append(row);
       });
     }
 
