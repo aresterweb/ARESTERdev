@@ -202,3 +202,18 @@ body.is-loading{overflow:hidden}
   .portfolio-grid{grid-template-columns:1fr}
   .portfolio-contact{align-items:flex-start;flex-direction:column}
 }
+
+\n/* ARESTERnews mobile editor improvements */
+@media(max-width:700px){
+  .an-wrap{width:calc(100% - 28px);max-width:100%;box-sizing:border-box}
+  .an-panel{min-width:0;max-width:100%;box-sizing:border-box}
+  #an-editor form{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+  #an-editor label{display:block;min-width:0;overflow-wrap:anywhere}
+  #an-editor input:not([type="file"]),#an-editor select,#an-editor textarea{
+    display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box
+  }
+  #an-editor textarea{resize:vertical}
+  #an-items{overflow-wrap:anywhere}
+  .an-actions{display:flex;flex-wrap:wrap;gap:8px}
+  .an-actions button,#an-editor button{min-height:42px;max-width:100%}
+}

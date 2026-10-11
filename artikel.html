@@ -94,7 +94,7 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(19,85,126,.18),transparen
       ${a.excerpt ? `<p><strong>${esc(a.excerpt)}</strong></p>` : ''}
       <div class="article-body">${esc(a.content).replace(/\n/g,'<br>')}</div>
       ${a.tags ? `<p class="article-meta">Topik: ${esc(a.tags)}</p>` : ''}
-      ${a.source_name ? `<div class="article-source"><strong>Sumber berita:</strong> ${a.source_url ? `<a href="${esc(a.source_url)}" target="_blank" rel="noopener noreferrer">${esc(a.source_name)}</a>` : esc(a.source_name)}</div>` : ''}
+      ${a.source_name ? `<div class="article-source"><strong>Sumber berita:</strong><ul>${String(a.source_name).split(/\r?\n/).map((name,i) => { const url = String(a.source_url || '').split(/\r?\n/)[i] || ''; let safe = ''; try { const u = new URL(url); if (u.protocol === 'https:' || u.protocol === 'http:') safe = u.href; } catch (_) {} return `<li>${safe ? `<a href="${esc(safe)}" target="_blank" rel="noopener noreferrer">${esc(name.trim())}</a>` : esc(name.trim())}</li>`; }).join('')}</ul></div>` : ''}
     `;
     document.title = a.title + ' — ARESTERnews';
   });

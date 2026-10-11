@@ -166,8 +166,8 @@
           <label>Tag / topik<input name="tags" maxlength="300" placeholder="AI, teknologi, startup (pisahkan dengan koma)"></label>
           <label>Ringkasan berita<textarea name="excerpt" rows="3" maxlength="500" placeholder="Inti berita dalam 1–3 kalimat"></textarea></label>
           <label>Isi berita lengkap *<textarea name="content" rows="12" required placeholder="Apa yang terjadi? Siapa yang terlibat? Kapan dan di mana? Mengapa penting? Apa dampaknya?"></textarea></label>
-          <label>Nama sumber berita<input name="source_name" maxlength="180" placeholder="Contoh: nama media, situs resmi, atau lembaga"></label>
-          <label>URL sumber asli<input name="source_url" type="url" placeholder="https://..."></label>
+          <label>Nama sumber berita (satu per baris)<textarea name="source_name" rows="3" maxlength="2000" placeholder="Reuters&#10;Bank Indonesia&#10;BPS"></textarea></label>
+          <label>URL sumber asli (satu per baris, urutannya sama)<textarea name="source_url" rows="3" maxlength="4000" placeholder="https://contoh.id/berita-1&#10;https://contoh.id/berita-2"></textarea></label>
           <label>Gambar sampul dari galeri HP<input name="cover_file" type="file" accept="image/jpeg,image/png,image/webp" /></label>
           <div id="an-cover-preview-wrap" hidden><img id="an-cover-preview" alt="Pratinjau gambar sampul" style="display:block;width:100%;max-height:320px;object-fit:cover;border-radius:12px;margin:10px 0"></div>
           <label>Atau URL gambar sampul<input name="cover_url" type="url" placeholder="https://..."></label>
@@ -333,8 +333,8 @@
           author_name: String(fd.get('author_name') || '').trim(),
           location: String(fd.get('location') || '').trim(),
           tags: String(fd.get('tags') || '').trim(),
-          source_name: String(fd.get('source_name') || '').trim(),
-          source_url: String(fd.get('source_url') || '').trim(),
+          source_name: String(fd.get('source_name') || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean).join('\n'),
+          source_url: String(fd.get('source_url') || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean).join('\n'),
           cover_url: manualCoverUrl,
           status,
           author_email: cfg.adminEmail,
