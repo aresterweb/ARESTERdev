@@ -11,7 +11,13 @@ create table if not exists public.aresternews_articles (
   published_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  author_email text not null default ''
+  author_email text not null default '',
+  category text not null default 'Lainnya',
+  author_name text not null default '',
+  location text not null default '',
+  tags text not null default '',
+  source_name text not null default '',
+  source_url text not null default ''
 );
 
 alter table public.aresternews_articles enable row level security;

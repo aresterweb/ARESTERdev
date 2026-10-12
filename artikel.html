@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Berita — ARESTERnews</title>
 <meta name="description" content="Baca berita lengkap dari ARESTERnews.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://aresterdev.vercel.app/artikel.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Berita — ARESTERnews">
+<meta property="og:description" content="Baca berita lengkap dari ARESTERnews.">
+<meta property="og:url" content="https://aresterdev.vercel.app/artikel.html">
+<meta property="og:image" content="https://aresterdev.vercel.app/assets/aresterdev-logo-original.png">
 <link rel="icon" href="assets/aresterdev-logo-original.png">
 <link rel="stylesheet" href="assets/style.css">
 <style>
@@ -67,6 +74,22 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(19,85,126,.18),transparen
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   })[c]);
+  const setMeta = (selector, attribute, value) => {
+    let el = document.head.querySelector(selector);
+    if (!el) {
+      el = document.createElement('meta');
+      const match = selector.match(/^meta\[(name|property)="([^"]+)"\]$/);
+      if (match) el.setAttribute(match[1], match[2]);
+      document.head.appendChild(el);
+    }
+    el.setAttribute(attribute, value);
+  };
+  const setCanonical = url => {
+    let el = document.head.querySelector('link[rel="canonical"]');
+    if (!el) { el = document.createElement('link'); el.rel = 'canonical'; document.head.appendChild(el); }
+    el.href = url;
+  };
+  const markNotIndexable = () => setMeta('meta[name="robots"]', 'content', 'noindex,follow');
   document.addEventListener('DOMContentLoaded', async () => {
     const cfg = window.ARESTERNEWS_CONFIG;
     if (!cfg || !window.supabase) {
@@ -75,6 +98,7 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(19,85,126,.18),transparen
     }
     const slug = new URLSearchParams(location.search).get('slug');
     if (!slug) {
+      markNotIndexable();
       host.textContent = 'Artikel tidak ditemukan. Silakan pilih berita dari halaman ARESTERnews.';
       return;
     }
@@ -83,6 +107,7 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(19,85,126,.18),transparen
       .select('id,title,slug,excerpt,content,cover_url,published_at,created_at,category,author_name,location,tags,source_name,source_url')
       .eq('slug', slug).eq('status','published').maybeSingle();
     if (error || !a) {
+      markNotIndexable();
       host.textContent = 'Artikel tidak ditemukan atau belum diterbitkan.';
       return;
     }
@@ -130,7 +155,30 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(19,85,126,.18),transparen
       ${a.tags ? `<p class="article-meta">Topik: ${esc(a.tags)}</p>` : ''}
       ${a.source_name ? `<div class="article-source"><strong>Sumber berita:</strong><ul>${String(a.source_name).split(/\r?\n/).map((name,i) => { const url = String(a.source_url || '').split(/\r?\n/)[i] || ''; let safe = ''; try { const u = new URL(url); if (u.protocol === 'https:' || u.protocol === 'http:') safe = u.href; } catch (_) {} return `<li>${safe ? `<a href="${esc(safe)}" target="_blank" rel="noopener noreferrer">${esc(name.trim())}</a>` : esc(name.trim())}</li>`; }).join('')}</ul></div>` : ''}
     `;
+    const canonicalUrl = 'https://aresterdev.vercel.app/artikel.html?slug=' + encodeURIComponent(a.slug);
+    const description = String(a.excerpt || a.content || 'Baca berita lengkap dari ARESTERnews.').replace(/\s+/g, ' ').trim().slice(0, 300);
+    const imageUrl = a.cover_url || 'https://aresterdev.vercel.app/assets/aresterdev-logo-original.png';
     document.title = a.title + ' — ARESTERnews';
+    setMeta('meta[name="description"]', 'content', description);
+    setMeta('meta[name="robots"]', 'content', 'index,follow');
+    setCanonical(canonicalUrl);
+    setMeta('meta[property="og:type"]', 'content', 'article');
+    setMeta('meta[property="og:title"]', 'content', document.title);
+    setMeta('meta[property="og:description"]', 'content', description);
+    setMeta('meta[property="og:url"]', 'content', canonicalUrl);
+    setMeta('meta[property="og:image"]', 'content', imageUrl);
+    const structuredData = {
+      '@context': 'https://schema.org', '@type': 'NewsArticle',
+      headline: a.title, description,
+      datePublished: a.published_at || a.created_at,
+      dateModified: a.updated_at || a.published_at || a.created_at,
+      author: {'@type': 'Person', name: a.author_name || 'ARESTERnews'},
+      publisher: {'@type': 'Organization', name: 'ARESTERnews', logo: {'@type': 'ImageObject', url: 'https://aresterdev.vercel.app/assets/aresterdev-logo-original.png'}},
+      mainEntityOfPage: canonicalUrl, image: imageUrl
+    };
+    let jsonLd = document.getElementById('aresternews-article-jsonld');
+    if (!jsonLd) { jsonLd = document.createElement('script'); jsonLd.id = 'aresternews-article-jsonld'; jsonLd.type = 'application/ld+json'; document.head.appendChild(jsonLd); }
+    jsonLd.textContent = JSON.stringify(structuredData);
   });
 })();
 </script>

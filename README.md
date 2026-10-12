@@ -23,3 +23,9 @@ Struktur ini menyediakan beberapa fondasi dasar (konten, navigasi, halaman priva
 
 ## Deploy GitHub Pages
 Upload isi folder ke repository GitHub (root branch yang dipakai Pages). Setelah domain/URL Pages ditentukan, perbarui canonical, Open Graph, robots, sitemap, lalu aktifkan Pages di Settings → Pages. GitHub Pages menyediakan hosting statis; custom domain dan ketersediaan fitur mengikuti ketentuan GitHub saat digunakan.
+
+
+## SEO dan ARESTERnews
+- Sitemap mencantumkan URL publik kanonis; halaman admin tidak boleh diindeks.
+- Untuk instalasi ARESTERnews baru, jalankan `supabase-aresternews.sql`, `supabase-aresternews-storage.sql`, lalu `supabase-aresternews-views.sql` di Supabase SQL Editor. Untuk database lama, jalankan `supabase-aresternews-migration.sql` jika kolom metadata belum tersedia.
+- Setelah deploy, periksa `/robots.txt` dan `/sitemap.xml`, lalu kirim sitemap melalui Google Search Console.
